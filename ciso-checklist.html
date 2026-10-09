@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CISO Checklist — Faster-Attacker Readiness</title>
+<style>
+:root{
+  --bg:#faf9f7;--fg:#1c1a17;--muted:#6b6560;--line:#e3ded7;--card:#ffffff;
+  --accent:#b3392c;--accent-soft:#f7e8e6;--ok:#3a6b4f;--amber:#9a6b1f;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1060px;margin:0 auto;padding:24px 20px 80px}
+header.top{border-bottom:2px solid var(--fg);padding:28px 0 18px;margin-bottom:28px}
+header.top h1{font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+header.top p{margin:0;color:var(--muted);max-width:62ch}
+header.top .tag{display:inline-block;margin-top:10px;font-size:12.5px;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:600}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:28px;align-items:start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+details.area{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  margin-bottom:12px;overflow:hidden}
+details.area>summary{cursor:pointer;padding:16px 20px;font-weight:650;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;list-style:none}
+details.area>summary::-webkit-details-marker{display:none}
+details.area>summary .pct{font-size:13px;color:var(--muted);white-space:nowrap}
+details.area>summary .pct b{color:var(--fg)}
+details.area[open]>summary{border-bottom:1px solid var(--line)}
+.area-body{padding:6px 20px 18px}
+.q{padding:12px 0;border-top:1px solid var(--line)}
+.q:first-child{border-top:0}
+.q p{font-weight:600;margin:0 0 8px;font-size:14.5px}
+.opts{display:flex;gap:8px;flex-wrap:wrap}
+.opts label{display:flex;align-items:center;gap:6px;border:1px solid var(--line);
+  border-radius:999px;padding:5px 13px;cursor:pointer;background:#fff;font-size:13.5px}
+.opts label:has(input:checked){border-color:var(--fg);background:var(--fg);color:#fff}
+.opts input{accent-color:var(--accent)}
+.opts label.no:has(input:checked){background:var(--accent);border-color:var(--accent)}
+label.ev{display:block;font-weight:600;font-size:13px;color:var(--muted);margin:14px 0 6px}
+textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;
+  font:inherit;background:#fff;min-height:56px;resize:vertical}
+.sticky{position:sticky;top:16px}
+.scorecard{background:var(--fg);color:#fff;border-radius:10px;padding:20px;margin-bottom:14px}
+.scorecard .k{font-size:12px;text-transform:uppercase;letter-spacing:.1em;opacity:.8}
+.scorecard .v{font-size:38px;font-weight:750;line-height:1.1;margin-top:2px}
+.scorecard .sub{font-size:13px;opacity:.85;margin-top:6px}
+.bars{margin:8px 0 2px}
+.bar{margin:8px 0}
+.bar .t{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:3px;gap:8px}
+.bar .t span:last-child{color:var(--muted);white-space:nowrap}
+.bar .track{height:7px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar .fill{height:100%;background:var(--fg);border-radius:99px;transition:width .25s}
+.bar.low .fill{background:var(--accent)}
+.bar.mid .fill{background:var(--amber)}
+.bar.hi .fill{background:var(--ok)}
+.prio{margin:12px 0 0;padding:0;list-style:none}
+.prio li{padding:7px 0 7px 22px;position:relative;font-size:13.5px;border-top:1px solid var(--line)}
+.prio li:first-child{border-top:0}
+.prio li::before{content:"";position:absolute;left:2px;top:13px;width:9px;height:9px;
+  border-radius:50%;background:var(--accent)}
+.actions{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+button.primary{background:var(--accent);color:#fff;border:0;border-radius:9px;
+  padding:13px 18px;font:inherit;font-weight:650;cursor:pointer}
+button.primary:hover{filter:brightness(1.07)}
+button.ghost{background:none;border:1px solid var(--line);border-radius:9px;
+  padding:10px 14px;font:inherit;cursor:pointer;color:var(--muted)}
+button.ghost:hover{border-color:var(--fg);color:var(--fg)}
+.fineprint{font-size:12.5px;color:var(--muted);margin-top:12px}
+dialog{border:0;border-radius:14px;padding:0;max-width:460px;width:calc(100% - 40px);
+  box-shadow:0 24px 80px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(20,16,12,.55)}
+dialog form{padding:26px 28px}
+dialog h3{margin:0 0 6px;font-size:20px}
+dialog p.sub{margin:0 0 18px;color:var(--muted);font-size:14px}
+dialog label{display:block;font-weight:600;font-size:13.5px;margin:12px 0 4px}
+dialog input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font:inherit}
+dialog .err{color:var(--accent);font-size:13px;margin-top:10px;min-height:16px}
+dialog .row2{display:flex;gap:10px;margin-top:20px}
+dialog .row2 button{flex:1;padding:12px;border-radius:9px;font:inherit;font-weight:600;cursor:pointer}
+dialog .submit{background:var(--fg);color:#fff;border:0}
+dialog .cancel{background:none;border:1px solid var(--line);color:var(--muted)}
+.privacy{font-size:12px;color:var(--muted);margin-top:14px}
+footer.site{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:13px}
+@media print{.sticky{position:static}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="tag">Evaluation toolkit</span>
+    <h1>CISO Checklist — Faster-Attacker Readiness</h1>
+    <p>Ten operational areas. Every item should be answerable with evidence,
+    a timestamp, a percentage, or a tested procedure — not with a maturity
+    label. Answer honestly; the weak areas are the work list.</p>
+    <noscript><p style="color:var(--accent);margin-top:10px">This tool needs
+    JavaScript — the checklist, scoring and report are all computed in your
+    browser and nothing is sent anywhere.</p></noscript>
+  </header>
+
+  <div class="layout">
+    <main id="areas"></main>
+
+    <aside>
+      <div class="sticky">
+        <div class="scorecard">
+          <div class="k">Readiness score</div>
+          <div class="v" id="total">—</div>
+          <div class="sub" id="answered">0 of 0 questions answered</div>
+        </div>
+        <div class="bars card-body" id="bars" style="background:var(--card);
+          border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px"></div>
+        <div style="background:var(--card);border:1px solid var(--line);
+          border-radius:10px;padding:14px 16px;margin-bottom:14px">
+          <b style="font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Immediate priorities</b>
+          <ul class="prio" id="prio"><li style="border-top:0;color:var(--muted)">Answer the checklist to rank priorities.</li></ul>
+        </div>
+        <div class="actions">
+          <button class="primary" id="download">Download branded report</button>
+          <button class="ghost" id="reset">Reset</button>
+          <p class="fineprint">The full report — scores, evidence, priorities and
+          the five questions to ask tomorrow — is generated after a quick
+          one-time enrollment. Answers are saved in this browser only.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="site">
+    Part of the <strong>When Attackers Move Faster: Practical Readiness Beyond AI Panic</strong>
+    toolkit (Anant Shrivastava). Community framework, provided as-is.
+  </footer>
+</div>
+
+<dialog id="enroll">
+  <form method="dialog" id="enroll-form" novalidate>
+    <h3>Enroll to get your report</h3>
+    <p class="sub">The branded readiness report is available to enrolled users.
+    Enrollment is one time and remembered in this browser.</p>
+    <label for="e-name">Full name</label>
+    <input id="e-name" type="text" autocomplete="name" required>
+    <label for="e-email">Work email</label>
+    <input id="e-email" type="email" autocomplete="email" required>
+    <label for="e-org">Organisation</label>
+    <input id="e-org" type="text" autocomplete="organization" required>
+    <div class="err" id="e-err"></div>
+    <div class="row2">
+      <button type="button" class="cancel" id="e-cancel">Cancel</button>
+      <button type="submit" class="submit">Enroll &amp; generate report</button>
+    </div>
+    <p class="privacy">Your details stay in this browser unless a submission
+    endpoint has been configured by the operator. No tracking is built in.</p>
+  </form>
+</dialog>
+
+<script>
+const ENROLL_ENDPOINT = "";
+const KEY = "wamf_checklist_state", EKEY = "wamf_enrollment";
+
+const AREAS = [
+ {id:"assets",name:"1 — Asset visibility and exposed attack surface",qs:[
+  "Do we know all internet-facing assets?",
+  "How quickly does a new asset appear in inventory?",
+  "Do we know externally reachable SaaS, APIs and admin interfaces?",
+  "Do we know critical third-party and dependency exposure?",
+  "Can we identify assets that have no clear owner?"],
+  ev:"Evidence: inventory freshness, external scan coverage, ownership coverage."},
+ {id:"identity",name:"2 — Identity and privilege",qs:[
+  "Can privileged human access be revoked immediately?",
+  "Can developer, CI and agent credentials be revoked in minutes?",
+  "Are standing privileges reduced or time-bounded?",
+  "Are secrets scoped to the smallest useful boundary?",
+  "Can an agent acquire or delegate additional authority?"],
+  ev:"Evidence: revocation time, JIT coverage, stale-secret count, privilege review results."},
+ {id:"patch",name:"3 — Patch and change decision speed",qs:[
+  "How long from finding to owner?",
+  "How long from owner to decision?",
+  "Can we mitigate without waiting for the normal patch cycle?",
+  "Can we stage and roll back changes safely?",
+  "Do we verify provenance before pulling packages, models or extensions?"],
+  ev:"Evidence: median decision time, emergency-change time, rollback test results."},
+ {id:"detect",name:"4 — Detection coverage",qs:[
+  "Do we have telemetry for the paths attackers are actually using?",
+  "How quickly can a new detection be deployed?",
+  "Can we detect unusual agent, tool or credential behaviour?",
+  "Can detections be tested before rollout?",
+  "Do we know where visibility disappears?"],
+  ev:"Evidence: coverage map, detection deployment time, test results, known blind spots."},
+ {id:"response",name:"5 — Response authority",qs:[
+  "Who can contain an incident at 2 AM — by name?",
+  "Which actions are pre-authorised?",
+  "Can we isolate a workload immediately?",
+  "Can we revoke credentials without waiting for a committee?",
+  "Can we stop an agent or automation centrally?"],
+  ev:"Evidence: named authority, escalation path, tested containment time."},
+ {id:"recover",name:"6 — Recovery confidence",qs:[
+  "When did we last restore the service we claim is recoverable?",
+  "Can we rebuild from a trusted state?",
+  "Can we rotate the credentials that matter?",
+  "Can we recover without reintroducing the compromised dependency or model?",
+  "Can we operate if an AI provider or model is unavailable?"],
+  ev:"Evidence: restore-test date, measured RTO/RPO, clean-build procedure, fallback test."},
+ {id:"dev",name:"7 — Developer and CI/CD workflows",qs:[
+  "Are developer laptops treated as part of the production trust boundary?",
+  "Are IDE extensions and plugins governed?",
+  "Are CI runners and build identities least-privileged?",
+  "Are package and artifact provenance checks enforced?",
+  "Are model weights, adapters and quantisations treated as third-party dependencies?"],
+  ev:"Evidence: extension policy, CI privilege map, provenance controls, model inventory."},
+ {id:"backlog",name:"8 — Security backlog reduction",qs:[
+  "How many findings are waiting for triage?",
+  "How many have no owner?",
+  "How old is the oldest unresolved critical finding?",
+  "Are we using AI to review stale findings and correlate context?",
+  "Is AI reducing backlog, or merely creating more findings?"],
+  ev:"Evidence: queue age, ownership rate, closure rate, time saved."},
+ {id:"safeai",name:"9 — Safe internal AI usage",qs:[
+  "What data can leave the organisation?",
+  "Which models and providers are approved?",
+  "What tools can agents invoke?",
+  "What credentials can models or agents reach?",
+  "Are actions logged well enough to reconstruct?",
+  "Can the workflow survive model or provider failure?",
+  "Do we verify model provenance and transformations?"],
+  ev:"Evidence: provider inventory, tool-permission map, logs, fallback test, model hashes and lineage."},
+ {id:"defai",name:"10 — Defensive AI use",qs:[
+  "Are we using AI to reduce triage time?",
+  "Are we using it to correlate evidence?",
+  "Are we generating and testing detection ideas?",
+  "Are we reviewing stale findings?",
+  "Are we using it for tabletop preparation?",
+  "Are recurring AI-assisted tasks becoming scripts, rules, tests or playbooks?"],
+  ev:"Evidence: time saved, backlog delta, generated controls, validation results."}
+];
+
+let state = load();
+
+function load(){
+  const fresh=()=>({answers:{},evidence:{}});
+  try{
+    const s=JSON.parse(localStorage.getItem(KEY));
+    if(!s||typeof s!=="object")return fresh();
+    const out=fresh();
+    const valid=new Set(AREAS.flatMap(a=>a.qs.map((_,i)=>a.id+"-"+i)));
+    if(s.answers&&typeof s.answers==="object")
+      for(const [k,v] of Object.entries(s.answers))
+        if(valid.has(k)&&(v===0||v===1||v===2))out.answers[k]=v;
+    if(s.evidence&&typeof s.evidence==="object")
+      for(const a of AREAS)
+        if(typeof s.evidence[a.id]==="string")out.evidence[a.id]=s.evidence[a.id];
+    return out;
+  }catch(e){return fresh();}
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));}
+
+function areaScore(a){
+  const done=a.qs.filter((_,i)=>state.answers[a.id+"-"+i]!==undefined).length;
+  const pts=a.qs.reduce((s,_,i)=>s+(+state.answers[a.id+"-"+i]||0),0);
+  return {pct:a.qs.length?Math.round(100*pts/(2*a.qs.length)):0,done};
+}
+
+function render(){
+  const bars=document.getElementById("bars");
+  bars.innerHTML="";
+  let totPct=0,done=0,total=0;
+  const ranked=[];
+  for(const a of AREAS){
+    const sc=areaScore(a);
+    totPct+=sc.pct;done+=sc.done;total+=a.qs.length;
+    ranked.push([a,sc]);
+    const row=document.createElement("div");
+    const cls=sc.pct<50?"low":sc.pct<80?"mid":"hi";
+    row.className="bar "+cls;
+    row.innerHTML=`<div class="t"><span>${esc(a.name.replace(/^\d+ — /,""))}</span>
+      <span>${sc.pct}% · ${sc.done}/${a.qs.length}</span></div>
+      <div class="track"><div class="fill" style="width:${sc.pct}%"></div></div>`;
+    bars.appendChild(row);
+    const sum=document.querySelector(`details[data-area="${a.id}"] .pct`);
+    if(sum)sum.innerHTML=`<b>${sc.pct}%</b> ready · ${sc.done}/${a.qs.length} answered`;
+  }
+  const overall=Math.round(totPct/AREAS.length);
+  document.getElementById("total").textContent=overall+"%";
+  document.getElementById("answered").textContent=`${done} of ${total} questions answered`;
+  const prio=document.getElementById("prio");
+  const weakest=ranked.filter(([,sc])=>sc.done>0)
+    .sort((x,y)=>x[1].pct-y[1].pct).slice(0,3);
+  prio.innerHTML=weakest.length
+    ? weakest.map(([a,sc])=>`<li>${esc(a.name.replace(/^\d+ — /,""))} — ${sc.pct}% ready</li>`).join("")
+    : `<li style="border-top:0;color:var(--muted)">Answer the checklist to rank priorities.</li>`;
+}
+
+function esc(s){return String(s).replace(/[&<>"']/g,
+  c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+function buildAreas(){
+  const host=document.getElementById("areas");
+  for(const a of AREAS){
+    const d=document.createElement("details");
+    d.className="area";d.dataset.area=a.id;
+    d.innerHTML=`<summary>${esc(a.name)}<span class="pct"></span></summary>
+      <div class="area-body">
+        ${a.qs.map((q,i)=>`<div class="q"><p>${esc(q)}</p>
+          <div class="opts">
+            <label class="no"><input type="radio" name="${a.id}-${i}" value="0"> No</label>
+            <label><input type="radio" name="${a.id}-${i}" value="1"> Partially</label>
+            <label><input type="radio" name="${a.id}-${i}" value="2"> Yes</label>
+          </div></div>`).join("")}
+        <label class="ev" for="ev-${a.id}">${esc(a.ev)}</label>
+        <textarea id="ev-${a.id}" data-ev="${a.id}" placeholder="Numbers, dates, owners, links — anything that would survive an audit."></textarea>
+      </div>`;
+    host.appendChild(d);
+  }
+  host.addEventListener("change",e=>{
+    if(e.target.name&&e.target.closest(".opts")){
+      state.answers[e.target.name]=+e.target.value;save();render();
+    }});
+  host.addEventListener("input",e=>{
+    if(e.target.dataset.ev){
+      state.evidence[e.target.dataset.ev]=e.target.value;save();
+    }});
+  for(const a of AREAS){
+    const ta=host.querySelector(`textarea[data-ev="${a.id}"]`);
+    if(ta&&state.evidence[a.id])ta.value=state.evidence[a.id];
+    a.qs.forEach((_,i)=>{
+      const v=state.answers[a.id+"-"+i];
+      if(v!==undefined){
+        const r=host.querySelector(`input[name="${a.id}-${i}"][value="${v}"]`);
+        if(r)r.checked=true;
+      }});
+  }
+}
+
+function enroll(){
+  return new Promise(resolve=>{
+    const d=document.getElementById("enroll"),err=document.getElementById("e-err");
+    const saved=localStorage.getItem(EKEY);
+    if(saved){
+      try{
+        const r=JSON.parse(saved);
+        if(r&&typeof r==="object"&&typeof r.email==="string"&&
+           typeof r.name==="string"&&typeof r.org==="string"){resolve(r);return;}
+      }catch(e){}
+    }
+    err.textContent="";
+    d.showModal();
+    d.oncancel=()=>resolve(null);
+    document.getElementById("e-cancel").onclick=()=>{d.close();resolve(null);};
+    document.getElementById("enroll-form").onsubmit=e=>{
+      e.preventDefault();
+      const name=document.getElementById("e-name").value.trim(),
+            email=document.getElementById("e-email").value.trim(),
+            org=document.getElementById("e-org").value.trim();
+      if(!name||!org||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+        err.textContent="Please fill in a name, a valid email and an organisation.";
+        return;
+      }
+      const rec={name,email,org,when:new Date().toISOString()};
+      localStorage.setItem(EKEY,JSON.stringify(rec));
+      if(ENROLL_ENDPOINT){
+        fetch(ENROLL_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify(rec)}).catch(()=>{});
+      }
+      d.close();resolve(rec);
+    };
+  });
+}
+
+function buildReport(enr){
+  const overall=Math.round(AREAS.reduce((s,a)=>s+areaScore(a).pct,0)/AREAS.length);
+  const weakest=AREAS.map(a=>[a,areaScore(a)]).filter(([,sc])=>sc.done>0)
+    .sort((x,y)=>x[1].pct-y[1].pct).slice(0,3).map(([a])=>a);
+  const rows=AREAS.map(a=>{
+    const sc=areaScore(a);
+    const qs=a.qs.map((q,i)=>{
+      const v=state.answers[a.id+"-"+i];
+      const t=v===undefined?"not answered":["No","Partially","Yes"][v];
+      return `<tr><td>${esc(q)}</td><td class="${v===0?"bad":""}">${t}</td></tr>`;
+    }).join("");
+    const ev=state.evidence[a.id];
+    return `<h2>${esc(a.name)} — ${sc.pct}% ready</h2>
+      <table>${qs}</table>
+      ${ev?`<div class="note">${esc(ev)}</div>`:""}`;
+  }).join("");
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Faster-attacker readiness report</title>
+<style>
+:root{--fg:#1c1a17;--muted:#6b6560;--line:#e3ded7;--accent:#b3392c}
+body{font:14px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--fg);margin:0;padding:40px}
+.band{border-bottom:3px solid var(--fg);padding-bottom:16px;margin-bottom:24px}
+.band .k{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:700}
+.band h1{font-size:24px;margin:6px 0 2px}
+.band .meta{color:var(--muted);font-size:13px}
+.score{border:2px solid var(--fg);border-radius:10px;padding:18px 20px;margin:18px 0}
+.score .k{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.score .v{font-size:30px;font-weight:750;margin-top:2px}
+.score .why{margin-top:6px;font-size:13.5px}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);
+  margin:26px 0 8px;border-bottom:1px solid var(--line);padding-bottom:6px}
+table{width:100%;border-collapse:collapse}
+td{border-top:1px solid var(--line);padding:7px 6px;vertical-align:top}
+td:last-child{font-weight:600;width:20%;text-align:right}
+td.bad{color:var(--accent)}
+.note{white-space:pre-wrap;background:#faf9f7;border:1px solid var(--line);
+  border-radius:8px;padding:10px 14px;font-size:12.5px;margin-top:8px}
+ol.priorities{padding-left:20px}
+ol.priorities li{margin:6px 0}
+footer{margin-top:34px;border-top:1px solid var(--line);padding-top:12px;color:var(--muted);font-size:11.5px}
+@media print{body{padding:0}.noprint{display:none}h2{page-break-after:avoid}}
+</style></head><body>
+<div class="band">
+  <div class="k">CISO checklist — faster-attacker readiness</div>
+  <h1>Organisational readiness report</h1>
+  <div class="meta">Prepared for <b>${esc(enr.org)}</b> · ${esc(enr.name)} ·
+    ${new Date().toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"})}</div>
+</div>
+<div class="score"><div class="k">Overall readiness</div>
+  <div class="v">${overall}%</div>
+  <div class="why">This is not a maturity label. It ranks where evidence is missing
+  or checks fail — the weak areas are the work list.</div></div>
+<h2>Immediate priorities</h2>
+${weakest.length
+  ? `<ol class="priorities">${weakest.map(a=>`<li>${esc(a.name)} — ${areaScore(a).pct}% ready</li>`).join("")}</ol>`
+  : `<div class="note">No questions answered yet — priorities appear once you start answering.</div>`}
+<h2>Five questions to ask tomorrow</h2>
+<ol class="priorities">
+  <li>How old can an internet-facing asset be before security knows?</li>
+  <li>Who can authorize containment at 2 AM?</li>
+  <li>Can developer, CI and agent credentials be revoked in minutes?</li>
+  <li>Can we push a new detection today?</li>
+  <li>When did we last restore the thing we claim is recoverable?</li>
+</ol>
+${rows}
+<p class="noprint"><button onclick="window.print()" style="padding:10px 16px;
+  font:inherit;font-weight:600;border:0;border-radius:8px;background:var(--fg);color:#fff;cursor:pointer">
+  Print / Save as PDF</button></p>
+<footer>Generated with the When Attackers Move Faster evaluation toolkit
+(Anant Shrivastava) — community framework, provided as-is. Enrollment:
+${esc(enr.email)}.</footer>
+</body></html>`;
+}
+
+function downloadReport(enr){
+  const html=buildReport(enr);
+  const blob=new Blob([html],{type:"text/html"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="ciso-readiness-report-"+new Date().toISOString().slice(0,10)+".html";
+  a.click();URL.revokeObjectURL(a.href);
+  const w=window.open("", "_blank");
+  if(w){w.document.write(html);w.document.close();}
+}
+
+document.getElementById("download").addEventListener("click",async()=>{
+  const enr=await enroll();
+  if(enr)downloadReport(enr);
+});
+document.getElementById("reset").addEventListener("click",()=>{
+  if(confirm("Clear all checklist answers?")){
+    localStorage.removeItem(KEY);state=load();
+    document.querySelectorAll(".opts input").forEach(r=>r.checked=false);
+    document.querySelectorAll("textarea[data-ev]").forEach(t=>t.value="");
+    render();
+  }});
+
+buildAreas();render();
+</script>
+</body>
+</html>
